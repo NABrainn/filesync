@@ -11,19 +11,21 @@ public final class Rclone {
     private Rclone() {
     }
 
-    public static Result<List<String>, OneDriveError> execute(String operation, String command, String... arguments) {
+    public static Result<Void, OneDriveError> execute(String operation, String command, String... arguments) {
+        var invocation = "rclone " + command + " " + String.join(" ", arguments);
+        return switch (CLI.execute(invocation)) {
+            case Failure(var error) -> Result.failure(new OneDriveError("Failed to " + operation + ": " + error.message()));
+            case Success(var lines) when containsCritical(lines) -> Result.failure(new OneDriveError("Failed to " + operation + ": " + String.join("\n", lines)));
+            case Success(var ignored) -> Result.success(null);
+        };
+    }
+
+    public static Result<List<String>, OneDriveError> executeWithOutput(String operation, String command, String... arguments) {
         var invocation = "rclone " + command + " " + String.join(" ", arguments);
         return switch (CLI.execute(invocation)) {
             case Failure(var error) -> Result.failure(new OneDriveError("Failed to " + operation + ": " + error.message()));
             case Success(var lines) when containsCritical(lines) -> Result.failure(new OneDriveError("Failed to " + operation + ": " + String.join("\n", lines)));
             case Success(var lines) -> Result.success(lines);
-        };
-    }
-
-    public static Result<Void, OneDriveError> completed(Result<List<String>, OneDriveError> result) {
-        return switch (result) {
-            case Failure(var error) -> Result.failure(error);
-            case Success(var ignored) -> Result.success(null);
         };
     }
 

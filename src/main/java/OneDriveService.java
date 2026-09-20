@@ -57,24 +57,24 @@ public class OneDriveService {
     public Result<Void, OneDriveError> downloadFile(Path sourcePath, Path destinationPath) {
         Objects.requireNonNull(sourcePath);
         Objects.requireNonNull(destinationPath);
-        return Rclone.completed(Rclone.execute("download file", "copyto", Rclone.remotePath(remote, sourcePath), Rclone.localPath(destinationPath)));
+        return Rclone.execute("download file", "copyto", Rclone.remotePath(remote, sourcePath), Rclone.localPath(destinationPath));
     }
 
     public Result<Void, OneDriveError> uploadFile(Path sourcePath, Path destinationPath) {
         Objects.requireNonNull(sourcePath);
         Objects.requireNonNull(destinationPath);
-        return Rclone.completed(Rclone.execute("upload file", "copyto", Rclone.localPath(sourcePath), Rclone.remotePath(remote, destinationPath)));
+        return Rclone.execute("upload file", "copyto", Rclone.localPath(sourcePath), Rclone.remotePath(remote, destinationPath));
     }
 
     public Result<Void, OneDriveError> uploadDirectory(Path sourcePath, Path destinationPath) {
         Objects.requireNonNull(sourcePath);
         Objects.requireNonNull(destinationPath);
-        return Rclone.completed(Rclone.execute("upload directory", "copy", Rclone.localPath(sourcePath), Rclone.remotePath(remote, destinationPath)));
+        return Rclone.execute("upload directory", "copy", Rclone.localPath(sourcePath), Rclone.remotePath(remote, destinationPath));
     }
 
     public Result<List<Path>, OneDriveError> listDirectory(Path path) {
         Objects.requireNonNull(path);
-        return switch (Rclone.execute("list directory", "lsf", Rclone.remotePath(remote, path))) {
+        return switch (Rclone.executeWithOutput("list directory", "lsf", Rclone.remotePath(remote, path))) {
             case Failure(var error) -> Result.failure(error);
             case Success(var entries) -> Result.success(entries.stream()
                     .filter(entry -> !entry.isBlank())
@@ -85,29 +85,29 @@ public class OneDriveService {
 
     public Result<Void, OneDriveError> createDirectory(Path path) {
         Objects.requireNonNull(path);
-        return Rclone.completed(Rclone.execute("create directory", "mkdir", Rclone.remotePath(remote, path)));
+        return Rclone.execute("create directory", "mkdir", Rclone.remotePath(remote, path));
     }
 
     public Result<Void, OneDriveError> deleteFile(Path path) {
         Objects.requireNonNull(path);
-        return Rclone.completed(Rclone.execute("delete file", "deletefile", Rclone.remotePath(remote, path)));
+        return Rclone.execute("delete file", "deletefile", Rclone.remotePath(remote, path));
     }
 
     public Result<Void, OneDriveError> deleteDirectory(Path path) {
         Objects.requireNonNull(path);
-        return Rclone.completed(Rclone.execute("delete directory", "purge", Rclone.remotePath(remote, path)));
+        return Rclone.execute("delete directory", "purge", Rclone.remotePath(remote, path));
     }
 
     public Result<Void, OneDriveError> moveFile(Path sourcePath, Path destinationPath) {
         Objects.requireNonNull(sourcePath);
         Objects.requireNonNull(destinationPath);
-        return Rclone.completed(Rclone.execute("move file", "moveto", Rclone.remotePath(remote, sourcePath), Rclone.remotePath(remote, destinationPath)));
+        return Rclone.execute("move file", "moveto", Rclone.remotePath(remote, sourcePath), Rclone.remotePath(remote, destinationPath));
     }
 
     public Result<Void, OneDriveError> moveDirectory(Path sourcePath, Path destinationPath) {
         Objects.requireNonNull(sourcePath);
         Objects.requireNonNull(destinationPath);
-        return Rclone.completed(Rclone.execute("move directory", "move", Rclone.remotePath(remote, sourcePath), Rclone.remotePath(remote, destinationPath)));
+        return Rclone.execute("move directory", "move", Rclone.remotePath(remote, sourcePath), Rclone.remotePath(remote, destinationPath));
     }
 
     public static OneDriveService of(String remote) {
