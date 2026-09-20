@@ -10,6 +10,9 @@ public class JobProvider {
         this.oneDriveService = oneDriveService;
         this.localStorageService = localStorageService;
         this.synologyService = synologyService;
+
+        var destination = localStorageService.tempDirectory();
+        localStorageService.deleteTempDirectory();
     }
 
     public List<Job> provide() {
